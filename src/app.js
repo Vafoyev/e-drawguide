@@ -15,7 +15,6 @@ app.use('/api/v1', routes);
 app.use(errorHandler);
 app.use(morgan('dev'));
 
-// Test route
 app.get('/', (req, res) => {
     res.send('E-DrawGuide API is working!');
 });

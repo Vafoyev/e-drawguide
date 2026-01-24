@@ -1,35 +1,34 @@
 module.exports = (sequelize, DataTypes) => {
-    const User = sequelize.define('User', {
+    const Library = sequelize.define('Library', {
         id: {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
             primaryKey: true
         },
-        full_name: {
+        title: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        phone: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            unique: true
-        },
-        password: {
+        author: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        role: {
-            type: DataTypes.ENUM('student', 'admin'),
-            defaultValue: 'student'
+        language: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        file_url: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        cover_url: {
+            type: DataTypes.STRING,
+            allowNull: true
         }
     }, {
         timestamps: true,
         underscored: true
     });
 
-    User.associate = (models) => {
-        User.hasMany(models.Result, { foreignKey: 'user_id', as: 'results' });
-    };
-
-    return User;
+    return Library;
 };

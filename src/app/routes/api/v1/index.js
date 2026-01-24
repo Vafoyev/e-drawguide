@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const authRoutes = require('./auth');
-const adminRoutes = require('./admin'); // Yangi qo'shildi
+const adminRoutes = require('./admin');
 
 router.use('/auth', authRoutes);
-router.use('/admin', adminRoutes); // Yangi qo'shildi
+router.use('/admin', adminRoutes);
 
 module.exports = router;

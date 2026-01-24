@@ -1,20 +1,28 @@
 const bcrypt = require('bcrypt');
-const User = require('../models/User');
+const { User } = require('../index');
 
 async function seedAdmin() {
     try {
+        if (!User) {
+            throw new Error("User modeli topilmadi! index.js yoki User.js da xato bor.");
+        }
+
         const hashedPassword = await bcrypt.hash('admin123', 12);
 
-        const admin = await User.findOrCreate({
-            where: { phone: '998900000000' }, // Admin telefoni
+        const [admin, created] = await User.findOrCreate({
+            where: { phone: '998900000000' },
             defaults: {
-                fullName: 'Super Admin',
+                full_name: 'Super Admin',
                 password: hashedPassword,
                 role: 'admin'
             }
         });
 
-        console.log('--- Admin muvaffaqiyatli yaratildi (yoki allaqachon bor) ---');
+        if (created) {
+            console.log('--- YANGI ADMIN YARATILDI ---');
+        } else {
+            console.log('--- ADMIN ALLAQACHON MAVJUD ---');
+        }
         process.exit();
     } catch (error) {
         console.error('Seederda xatolik:', error);

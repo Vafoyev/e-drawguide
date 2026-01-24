@@ -1,16 +1,34 @@
 const { Sequelize } = require('sequelize');
-require('dotenv').config();
+const config = require('./config')[process.env.NODE_ENV || 'development'];
 
 const sequelize = new Sequelize(
-    process.env.DB_NAME,
-    process.env.DB_USER,
-    process.env.DB_PASS,
+    config.database,
+    config.username,
+    config.password,
     {
-        host: process.env.DB_HOST,
-        dialect: 'postgres',
-        port: process.env.DB_PORT,
+        host: config.host,
+        port: config.port,
+        dialect: config.dialect,
         logging: false
     }
 );
 
-module.exports = sequelize;
+const models = {};
+
+models.User = require('./models/User')(sequelize, Sequelize.DataTypes);
+models.Video = require('./models/Video')(sequelize, Sequelize.DataTypes);
+models.Library = require('./models/Library')(sequelize, Sequelize.DataTypes);
+models.Quiz = require('./models/Quiz')(sequelize, Sequelize.DataTypes);
+models.Question = require('./models/Question')(sequelize, Sequelize.DataTypes);
+models.Result = require('./models/Result')(sequelize, Sequelize.DataTypes);
+
+Object.keys(models).forEach(modelName => {
+    if (models[modelName].associate) {
+        models[modelName].associate(models);
+    }
+});
+
+module.exports = {
+    sequelize,
+    ...models
+};

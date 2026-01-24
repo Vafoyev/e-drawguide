@@ -6,6 +6,12 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
+    "db:migrate": "npx sequelize-cli db:migrate",
+    "db:undo": "npx sequelize-cli db:migrate:undo",
+    "db:clean": "npx sequelize-cli db:migrate:undo:all",
+    "db:reset": "npm run db:clean && npm run db:migrate",
+    "db:seed": "node src/database/seeders/AdminSeeder.js",
+    "db:setup": "npm run db:reset && npm run db:seed",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
