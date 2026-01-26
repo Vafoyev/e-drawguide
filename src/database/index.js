@@ -9,7 +9,10 @@ const sequelize = new Sequelize(
         host: config.host,
         port: config.port,
         dialect: config.dialect,
-        logging: false
+        logging: false,
+        define: {
+            underscored: true
+        }
     }
 );
 
@@ -21,6 +24,7 @@ models.Library = require('./models/Library')(sequelize, Sequelize.DataTypes);
 models.Quiz = require('./models/Quiz')(sequelize, Sequelize.DataTypes);
 models.Question = require('./models/Question')(sequelize, Sequelize.DataTypes);
 models.Result = require('./models/Result')(sequelize, Sequelize.DataTypes);
+models.AppConfig = require('./models/AppConfig')(sequelize, Sequelize.DataTypes);
 
 Object.keys(models).forEach(modelName => {
     if (models[modelName].associate) {

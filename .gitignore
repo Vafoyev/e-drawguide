@@ -26,5 +26,7 @@ dist/
 build/
 .cache/
 .npm/
+uploads/
+*.log
 
 .sequelizerc-old

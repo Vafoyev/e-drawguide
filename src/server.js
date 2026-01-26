@@ -1,22 +1,24 @@
-const app = require('./app');
-const {sequelize} = require('./database/index');
 require('dotenv').config();
+const app = require('./app');
+const { sequelize } = require('./database/index');
+const logger = require('./utils/logger');
 
 const PORT = process.env.PORT || 5000;
 
 async function start() {
     try {
         await sequelize.authenticate();
-        console.log('--- BAZAGA ULANISH MUVAFFAQIYATLI ---');
+        logger.info('--- BAZAGA ULANISH MUVAFFAQIYATLI ---');
 
-        // Baza bilan sinxronizatsiya
-        await sequelize.sync({ force: false });
+        if (process.env.NODE_ENV === 'development') {
+        }
 
         app.listen(PORT, () => {
-            console.log(`--- SERVER ${PORT}-PORTDA ISHLAYAPTI ---`);
+            logger.info(`--- SERVER ${PORT}-PORTDA ISHLAYAPTI (${process.env.NODE_ENV} mode) ---`);
         });
     } catch (error) {
-        console.error('Xatolik yuz berdi:', error.message);
+        logger.error('Serverni ishga tushirishda xatolik: ', error);
+        process.exit(1);
     }
 }
 

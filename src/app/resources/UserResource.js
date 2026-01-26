@@ -1,12 +1,19 @@
 class UserResource {
     static format(user) {
+        if (!user) return null;
+
         return {
-            id: user.id,
-            full_name: user.full_name,
-            phone: user.phone,
-            role: user.role,
-            created_at: user.created_at
+            id: user.id || null,
+            full_name: user.full_name || user.fullName || "Noma'lum",
+            phone: user.phone || "",
+            role: user.role || "student",
+            created_at: user.created_at || user.createdAt || null
         };
+    }
+
+    static collection(users) {
+        if (!users || !Array.isArray(users)) return [];
+        return users.map(user => this.format(user));
     }
 }
 

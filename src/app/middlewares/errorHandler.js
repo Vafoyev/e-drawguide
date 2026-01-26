@@ -1,10 +1,20 @@
-module.exports = (err, req, res, next) => {
-    const statusCode = err.statusCode || 500;
-    const message = err.isOperational ? err.message : "Serverda ichki xatolik yuz berdi";
+const logger = require('../../utils/logger');
 
-    if (statusCode === 500) {
-        console.error(err.stack);
+module.exports = (err, req, res, next) => {
+    let statusCode = err.statusCode || 500;
+    let message = err.message || "Serverda ichki xatolik yuz berdi";
+
+    if (err.name === 'SequelizeUniqueConstraintError') {
+        statusCode = 409;
+        message = err.errors[0].message;
     }
+
+    if (err.name === 'SequelizeValidationError') {
+        statusCode = 400;
+        message = err.errors.map(e => e.message).join(', ');
+    }
+
+    logger.error(`${statusCode} - ${message} - ${req.originalUrl} - ${req.method} - ${req.ip} - Stack: ${err.stack}`);
 
     res.status(statusCode).json({
         success: false,
