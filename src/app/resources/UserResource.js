@@ -3,8 +3,8 @@ class UserResource {
         if (!user) return null;
 
         return {
-            id: user.id || null,
-            full_name: user.full_name || user.fullName || "Noma'lum",
+            id: user.id || "",
+            full_name: user.full_name || user.fullName || "Foydalanuvchi",
             phone: user.phone || "",
             role: user.role || "student",
             created_at: user.created_at || user.createdAt || null
