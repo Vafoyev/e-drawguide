@@ -1,30 +1,25 @@
-class QuestionResource {
-    /**
-     * @param {Object} question - Question modeli
-     * @param {string} userRole - 'student' yoki 'admin'
-     */
-    static format(question, userRole = 'student') {
-        if (!question) return null;
+const { getFullUrl } = require('../../utils/urlHelper');
 
-        const formatted = {
-            id: question.id,
-            quiz_id: question.quiz_id || "",
-            question_text: question.question_text || "",
-            options: Array.isArray(question.options) ? question.options : [],
-            created_at: question.created_at
+class VideoResource {
+    static format(video) {
+        if (!video) return null;
+        return {
+            id: video.id,
+            title: video.title || "",
+            description: video.description || "",
+            thumbnail_url: getFullUrl(video.thumbnail_url),
+            video_url: getFullUrl(video.video_url),
+            created_at: video.created_at
         };
-
-        if (userRole === 'admin') {
-            formatted.correct_answer = question.correct_answer || "";
-        }
-
-        return formatted;
     }
 
-    static collection(questions, userRole = 'student') {
-        if (!questions || !Array.isArray(questions)) return [];
-        return questions.map(q => this.format(q, userRole));
+    static collection(data) {
+        if (!data || !data.items) return { items: [], meta: {} };
+        return {
+            items: data.items.map(video => this.format(video)),
+            meta: data.meta
+        };
     }
 }
 
-module.exports = QuestionResource;
+module.exports = VideoResource;

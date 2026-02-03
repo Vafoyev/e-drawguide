@@ -1,24 +1,39 @@
 const logger = require('../../utils/logger');
+const { removeFiles } = require('../../utils/fileHelper');
+const { t } = require('../../utils/i18n');
 
-module.exports = (err, req, res, next) => {
-    let statusCode = err.statusCode || 500;
-    let message = err.message || "Serverda ichki xatolik yuz berdi";
+module.exports = async (err, req, res, next) => {
+    const lang = req.lang || 'uz';
+    err.statusCode = err.statusCode || 500;
+
+    if (req.file || req.files) {
+        try {
+            await removeFiles(req.file || req.files);
+        } catch (fileError) {
+            logger.error('Cleanup Error:', fileError);
+        }
+    }
+
+    if (err.statusCode === 500) {
+        logger.error('SERVER_ERROR:', {
+            message: err.message,
+            stack: err.stack,
+            path: req.originalUrl,
+            method: req.method,
+            ip: req.ip,
+            userId: req.user ? req.user.id : null
+        });
+        err.message = t('common.server_error', lang);
+    }
 
     if (err.name === 'SequelizeUniqueConstraintError') {
-        statusCode = 409;
-        message = err.errors[0].message;
+        err.statusCode = 409;
+        err.message = t('validation.unique_constraint', lang);
     }
 
-    if (err.name === 'SequelizeValidationError') {
-        statusCode = 400;
-        message = err.errors.map(e => e.message).join(', ');
-    }
-
-    logger.error(`${statusCode} - ${message} - ${req.originalUrl} - ${req.method} - ${req.ip} - Stack: ${err.stack}`);
-
-    res.status(statusCode).json({
+    res.status(err.statusCode).json({
         success: false,
-        message: message,
-        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+        message: err.message,
+        ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
     });
 };

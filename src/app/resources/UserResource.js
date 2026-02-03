@@ -3,17 +3,21 @@ class UserResource {
         if (!user) return null;
 
         return {
-            id: user.id || "",
-            full_name: user.full_name || user.fullName || "Foydalanuvchi",
-            phone: user.phone || "",
-            role: user.role || "student",
-            created_at: user.created_at || user.createdAt || null
+            id: user.id,
+            full_name: user.full_name,
+            phone: user.phone,
+            role: user.role,
+            created_at: user.created_at
         };
     }
 
-    static collection(users) {
-        if (!users || !Array.isArray(users)) return [];
-        return users.map(user => this.format(user));
+    static collection(data) {
+        if (!data || !data.items) return { items: [], meta: {} };
+
+        return {
+            items: data.items.map(user => this.format(user)),
+            meta: data.meta
+        };
     }
 }
 

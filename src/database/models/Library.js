@@ -27,7 +27,9 @@ module.exports = (sequelize, DataTypes) => {
         }
     }, {
         timestamps: true,
-        underscored: true
+        underscored: true,
+        paranoid: true,
+        tableName: 'libraries'
     });
 
     return Library;

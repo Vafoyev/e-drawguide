@@ -1,36 +1,26 @@
 const jwt = require('jsonwebtoken');
-const { User } = require('../../database');
+const AppError = require('../../utils/AppError');
+const { User } = require('../../database/index');
 
 module.exports = async (req, res, next) => {
+    let token;
+    if (req.headers.authorization?.startsWith('Bearer')) {
+        token = req.headers.authorization.split(' ')[1];
+    }
+
+    if (!token) return next(new AppError("Iltimos, tizimga kiring!", 401));
+
     try {
-        let token;
-        if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-            token = req.headers.authorization.split(' ')[1];
-        }
-
-        if (!token) {
-            return res.status(401).json({ success: false, message: "Iltimos, tizimga kiring!" });
-        }
-
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        const user = await User.findByPk(decoded.id, {
-            attributes: { exclude: ['password'] }
-        });
-
-        if (!user) {
-            return res.status(401).json({ success: false, message: "Foydalanuvchi endi mavjud emas!" });
+        const currentUser = await User.findByPk(decoded.id);
+        if (!currentUser) {
+            return next(new AppError("Ushbu tokenga tegishli foydalanuvchi endi mavjud emas!", 401));
         }
 
-        req.user = user;
+        req.user = currentUser;
         next();
-    } catch (error) {
-        if (error.name === 'TokenExpiredError') {
-            return res.status(401).json({ success: false, message: "Token muddati tugagan, qayta login qiling!" });
-        }
-        if (error.name === 'JsonWebTokenError') {
-            return res.status(401).json({ success: false, message: "Yaroqsiz token!" });
-        }
-        return res.status(401).json({ success: false, message: "Autentifikatsiya xatosi!" });
+    } catch (err) {
+        return next(new AppError("Token yaroqsiz yoki muddati o'tgan!", 401));
     }
 };

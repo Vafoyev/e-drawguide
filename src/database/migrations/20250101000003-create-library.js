@@ -1,8 +1,7 @@
 'use strict';
-
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('videos', {
+    await queryInterface.createTable('libraries', {
       id: {
         allowNull: false,
         primaryKey: true,
@@ -13,15 +12,19 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      description: {
-        type: Sequelize.TEXT,
-        allowNull: true
-      },
-      video_url: {
+      author: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      thumbnail_url: {
+      language: {
+        type: Sequelize.STRING(10),
+        allowNull: false
+      },
+      file_url: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      cover_url: {
         type: Sequelize.STRING,
         allowNull: true
       },
@@ -34,10 +37,15 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: Sequelize.fn('NOW')
+      },
+      deleted_at: {
+        allowNull: true,
+        type: Sequelize.DATE
       }
     });
+    await queryInterface.addIndex('libraries', ['language', 'title']);
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('videos');
+    await queryInterface.dropTable('libraries');
   }
 };

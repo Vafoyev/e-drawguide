@@ -1,40 +1,30 @@
 const LibraryService = require('../../../services/LibraryService');
-const { createLibrarySchema } = require('../../requests/library/LibraryRequest');
+const catchAsync = require('../../../utils/catchAsync');
 const AppError = require('../../../utils/AppError');
 
 class LibraryController {
-    async create(req, res, next) {
-        try {
-            const { error, value } = createLibrarySchema.validate(req.body);
-            if (error) {
-                return next(new AppError(error.details[0].message, 400));
-            }
-
-            if (!req.files || !req.files['book_file']) {
-                return next(new AppError('Kitob fayli (PDF) yuklanishi shart!', 400));
-            }
-
-            const library = await LibraryService.create(value, req.files);
-
-            res.status(201).json({
-                success: true,
-                message: "Kitob muvaffaqiyatli qo'shildi",
-                data: library
-            });
-        } catch (err) {
-            next(err);
-        }
+    constructor(libraryService) {
+        this.libraryService = libraryService;
     }
 
-    async index(req, res, next) {
-        try {
-            const { lang } = req.query;
-            const books = await LibraryService.getAll(lang);
-            res.status(200).json({ success: true, data: books });
-        } catch (err) {
-            next(err);
+    create = catchAsync(async (req, res) => {
+        if (!req.files || !req.files['book_file']) {
+            throw new AppError('Kitob fayli (PDF) yuklanishi shart!', 400);
         }
-    }
+        const library = await this.libraryService.create(req.body, req.files);
+        res.status(201).json({
+            success: true,
+            data: library
+        });
+    });
+
+    delete = catchAsync(async (req, res) => {
+        await this.libraryService.delete(req.params.id);
+        res.status(200).json({
+            success: true,
+            message: "Kitob muvaffaqiyatli o'chirildi"
+        });
+    });
 }
 
-module.exports = new LibraryController();
+module.exports = new LibraryController(LibraryService);

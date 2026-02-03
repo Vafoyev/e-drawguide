@@ -15,7 +15,9 @@ module.exports = (sequelize, DataTypes) => {
         }
     }, {
         timestamps: true,
-        underscored: true
+        underscored: true,
+        paranoid: true,
+        tableName: 'quizzes'
     });
 
     Quiz.associate = (models) => {

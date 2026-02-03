@@ -1,36 +1,22 @@
-require('dotenv').config();
-
 module.exports = {
     openapi: '3.0.0',
     info: {
         title: 'E-DrawGuide API Dokumentatsiyasi',
         version: '1.0.0',
-        description: `
-## Elektron o'quv qo'llanma (LMS) Backend tizimi
-Ushbu hujjat Flutter va Web dasturchilar uchun mo'ljallangan.
-
-**Asosiy funksiyalar:**
-* 🔐 **Auth:** JWT orqali himoyalangan autentifikatsiya.
-* 📚 **Library:** Elektron kutubxona boshqaruvi.
-* 🎥 **Video:** Video darslar tizimi.
-* ❓ **Quiz:** (Tez orada) Test ishlash tizimi.
-
-**Xavfsizlik:**
-Aksariyat APIlar uchun \`Authorization: Bearer <token>\` headeri talab qilinadi.
-        `,
+        description: 'LMS - Elektron oʻquv qoʻllanma tizimi uchun REST API hujjati.',
         contact: {
             name: 'Backend Developer',
-            url: 'https://github.com/',
-        },
+            url: 'https://e-drawguide.uz'
+        }
     },
     servers: [
         {
-            url: `http://localhost:${process.env.PORT || 4001}/api/v1`,
-            description: '💻 Local Server',
+            url: 'http://localhost:4001/api/v1',
+            description: 'Local development server'
         },
         {
             url: 'https://api.e-drawguide.uz/api/v1',
-            description: '🚀 Production Server',
+            description: 'Production server'
         }
     ]
 };

@@ -21,13 +21,11 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false
         },
-        date: {
-            type: DataTypes.DATE,
-            defaultValue: DataTypes.NOW
-        }
     }, {
         timestamps: true,
-        underscored: true
+        underscored: true,
+        paranoid: true,
+        tableName: 'results'
     });
 
     Result.associate = (models) => {

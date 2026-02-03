@@ -1,5 +1,4 @@
 'use strict';
-
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('quizzes', {
@@ -26,8 +25,14 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: Sequelize.fn('NOW')
+      },
+      deleted_at: {
+        allowNull: true,
+        type: Sequelize.DATE
       }
     });
+    await queryInterface.addIndex('quizzes', ['is_active']);
+    await queryInterface.addIndex('quizzes', ['title']);
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('quizzes');

@@ -4,40 +4,47 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const morgan = require('morgan');
+const compression = require('compression');
+const hpp = require('hpp');
+const xss = require('xss-clean');
+const swaggerUi = require('swagger-ui-express');
+
 const routes = require('./app/routes/api/v1/index');
 const errorHandler = require('./app/middlewares/errorHandler');
-const swaggerUi = require('swagger-ui-express');
-const specs = require('./infrastructure/swagger/swaggerConfig');
+const logger = require('./utils/logger');
+const swaggerSpecs = require('./infrastructure/swagger/swaggerConfig');
+const AppError = require('./utils/AppError');
+const setLang = require('./app/middlewares/setLang');
 
 const app = express();
 
 app.use(helmet());
+app.use(xss());
+app.use(hpp());
+app.use(compression());
 
-const limiter = rateLimit({
+app.use(morgan('combined', { stream: logger.stream }));
+
+const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 100,
-    message: { success: false, message: "Juda ko'p so'rov yuborildi, birozdan keyin urinib ko'ring." }
+    max: 20,
+    message: { success: false, message: "Too many requests, please try again later." },
+    standardHeaders: true,
+    legacyHeaders: false,
 });
-app.use('/api/', limiter);
 
-const corsOptions = {
-    origin: process.env.NODE_ENV === 'production' ? ['https://sizning-saytingiz.uz', 'http://localhost:3000'] : '*',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
-};
+app.use('/api/v1/auth/login', authLimiter);
+app.use('/api/v1/auth/register', authLimiter);
 
-app.use(cors(corsOptions));
-app.use(express.json({ limit: '10kb' }));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
+app.use(cors({ origin: '*', credentials: true }));
+app.use(express.json({ limit: '1mb' }));
+app.use(setLang);
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
-app.use(morgan('dev'));
-
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
-
 app.use('/api/v1', routes);
 
 app.all('*', (req, res, next) => {
-    const AppError = require('./utils/AppError');
-    next(new AppError(`Bu yo'nalish topilmadi: ${req.originalUrl}`, 404));
+    next(new AppError(`Route not found: ${req.originalUrl}`, 404));
 });
 
 app.use(errorHandler);

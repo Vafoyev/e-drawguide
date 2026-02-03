@@ -12,6 +12,12 @@ const sequelize = new Sequelize(
         logging: false,
         define: {
             underscored: true
+        },
+        pool: {
+            max: 10,
+            min: 0,
+            acquire: 30000,
+            idle: 10000
         }
     }
 );
@@ -25,6 +31,7 @@ models.Quiz = require('./models/Quiz')(sequelize, Sequelize.DataTypes);
 models.Question = require('./models/Question')(sequelize, Sequelize.DataTypes);
 models.Result = require('./models/Result')(sequelize, Sequelize.DataTypes);
 models.AppConfig = require('./models/AppConfig')(sequelize, Sequelize.DataTypes);
+models.AuditLog = require('./models/AuditLog')(sequelize, Sequelize.DataTypes);
 
 Object.keys(models).forEach(modelName => {
     if (models[modelName].associate) {

@@ -1,0 +1,25 @@
+paths:
+  /config/check-version:
+    get:
+      tags: [Config]
+      summary: Ilova yangilanishini tekshirish
+      parameters:
+        - name: platform
+          in: query
+          required: true
+          schema: { type: string, enum: [android, ios] }
+        - name: version
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        200:
+          description: Update status
+
+  /health:
+    get:
+      tags: [ System ]
+      summary: Sistema holatini tekshirish (Health Check)
+      responses:
+        200:
+          description: Tizim sog'lom

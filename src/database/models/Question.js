@@ -23,7 +23,14 @@ module.exports = (sequelize, DataTypes) => {
         }
     }, {
         timestamps: true,
-        underscored: true
+        underscored: true,
+        tableName: 'questions',
+        defaultScope: {
+            attributes: { exclude: ['correct_answer'] }
+        },
+        scopes: {
+            withAnswer: { attributes: {} }
+        }
     });
 
     Question.associate = (models) => {

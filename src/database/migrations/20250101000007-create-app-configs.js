@@ -1,33 +1,38 @@
 'use strict';
-
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('libraries', {
+    await queryInterface.createTable('app_configs', {
       id: {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4
       },
-      title: {
+      platform: {
+        type: Sequelize.ENUM('android', 'ios'),
+        allowNull: false
+      },
+      latest_version: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      author: {
+      minimum_version: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      language: {
-        type: Sequelize.STRING(10),
-        allowNull: false
-      },
-      file_url: {
+      update_url: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      cover_url: {
-        type: Sequelize.STRING,
-        allowNull: true
+      is_force_update: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+      },
+      message_uz: {
+        type: Sequelize.STRING
+      },
+      message_ru: {
+        type: Sequelize.STRING
       },
       created_at: {
         allowNull: false,
@@ -40,8 +45,9 @@ module.exports = {
         defaultValue: Sequelize.fn('NOW')
       }
     });
+    await queryInterface.addIndex('app_configs', ['platform']);
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('libraries');
+    await queryInterface.dropTable('app_configs');
   }
 };

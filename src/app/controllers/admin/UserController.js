@@ -1,25 +1,33 @@
+const catchAsync = require('../../../utils/catchAsync');
 const UserService = require('../../../services/UserService');
 const UserResource = require('../../resources/UserResource');
 
 class UserController {
-    async index(req, res, next) {
-        try {
-            const { page, limit } = req.query;
-            const data = await UserService.getAllUsers(page, limit);
-
-            res.json({
-                success: true,
-                data: UserResource.collection(data.users),
-                meta: {
-                    total: data.total,
-                    pages: data.totalPages,
-                    current: data.currentPage
-                }
-            });
-        } catch (err) {
-            next(err);
-        }
+    constructor(userService) {
+        this.userService = userService;
     }
+
+    index = catchAsync(async (req, res) => {
+        const { page, limit } = req.query;
+        const result = await this.userService.getAllUsers(page, limit);
+        const response = UserResource.collection(result);
+
+        res.status(200).json({
+            success: true,
+            ...response
+        });
+    });
+
+    getResults = catchAsync(async (req, res) => {
+        const { page, limit } = req.query;
+        const result = await this.userService.getAllResults(page, limit);
+
+        res.status(200).json({
+            success: true,
+            data: result.items,
+            meta: result.meta
+        });
+    });
 }
 
-module.exports = new UserController();
+module.exports = new UserController(UserService);

@@ -1,7 +1,7 @@
 const multer = require('multer');
 const path = require('path');
+const crypto = require('crypto');
 const fs = require('fs');
-const { v4: uuidv4 } = require('uuid');
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -17,26 +17,30 @@ const storage = multer.diskStorage({
         cb(null, folder);
     },
     filename: (req, file, cb) => {
-        cb(null, uuidv4() + path.extname(file.originalname));
+        const uniqueName = `${crypto.randomUUID()}${path.extname(file.originalname)}`;
+        cb(null, uniqueName);
     }
 });
 
 const fileFilter = (req, file, cb) => {
-    if (file.fieldname === 'book_file') {
-        if (file.mimetype === 'application/pdf') cb(null, true);
-        else cb(new Error('Kutubxona uchun faqat PDF yuklash mumkin!'), false);
-    } else if (file.fieldname === 'cover_file' || file.fieldname === 'thumbnail_file') {
-        if (file.mimetype.startsWith('image/')) cb(null, true);
-        else cb(new Error('Rasm yuklash kerak!'), false);
-    } else {
+    const allowedMimeTypes = {
+        'book_file': ['application/pdf'],
+        'cover_file': ['image/jpeg', 'image/png', 'image/jpg'],
+        'thumbnail_file': ['image/jpeg', 'image/png', 'image/jpg'],
+        'video_file': ['video/mp4', 'video/x-matroska', 'video/quicktime']
+    };
+
+    if (allowedMimeTypes[file.fieldname] && allowedMimeTypes[file.fieldname].includes(file.mimetype)) {
         cb(null, true);
+    } else {
+        cb(new Error(`Noto'g'ri fayl formati: ${file.fieldname}`), false);
     }
 };
 
 const upload = multer({
     storage: storage,
     fileFilter: fileFilter,
-    limits: { fileSize: 50 * 1024 * 1024 }
+    limits: { fileSize: 100 * 1024 * 1024 }
 });
 
 module.exports = upload;

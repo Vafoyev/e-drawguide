@@ -1,49 +1,39 @@
 components:
   securitySchemes:
-    BearerAuth:
+    bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: JWT tokenni kiriting
+
   schemas:
     User:
       type: object
       properties:
-        id:
-          type: string
-          format: uuid
-          example: d290f1ee-6c54-4b01-90e6-d701748f0851
-        full_name:
-          type: string
-          example: Ali Valiyev
-        phone:
-          type: string
-          example: "998901234567"
-        role:
-          type: string
-          enum: [student, admin]
-          example: student
+        id: { type: string, format: uuid }
+        full_name: { type: string }
+        phone: { type: string }
+        role: { type: string, enum: [admin, student] }
+
     Video:
       type: object
       properties:
-        id:
-          type: string
-          format: uuid
-        title:
-          type: string
-        video_url:
-          type: string
-        thumbnail_url:
-          type: string
-    Book:
+        id: { type: string, format: uuid }
+        title: { type: string }
+        video_url: { type: string }
+        thumbnail_url: { type: string }
+
+    Library:
       type: object
       properties:
-        id:
-          type: string
-          format: uuid
-        title:
-          type: string
-        author:
-          type: string
-        file_url:
-          type: string
+        id: { type: string, format: uuid }
+        title: { type: string }
+        author: { type: string }
+        language: { type: string }
+        file_url: { type: string }
+        cover_url: { type: string }
+
+    Error:
+      type: object
+      properties:
+        success: { type: boolean, example: false }
+        message: { type: string }

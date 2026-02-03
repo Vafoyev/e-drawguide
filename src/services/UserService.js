@@ -1,22 +1,43 @@
-const { User } = require('../database');
+const { User, Result, Quiz } = require('../database');
+const ApiFeatures = require('../utils/apiFeatures');
 
 class UserService {
     async getAllUsers(page = 1, limit = 10) {
-        const offset = (page - 1) * limit;
-
-        const { count, rows } = await User.findAndCountAll({
-            attributes: ['id', 'full_name', 'phone', 'role', 'created_at'],
-            limit: limit,
-            offset: offset,
+        const { limit: l, offset } = ApiFeatures.getPagination(page, limit);
+        const data = await User.findAndCountAll({
+            where: { role: 'student' },
+            attributes: ['id', 'full_name', 'phone', 'created_at'],
+            limit: l,
+            offset,
             order: [['created_at', 'DESC']]
         });
+        return ApiFeatures.formatResponse(data, page, l);
+    }
 
-        return {
-            users: rows,
-            total: count,
-            totalPages: Math.ceil(count / limit),
-            currentPage: Number(page)
-        };
+    async getAllResults(page = 1, limit = 20) {
+        const { limit: l, offset } = ApiFeatures.getPagination(page, limit);
+        const data = await Result.findAndCountAll({
+            include: [
+                { model: User, as: 'user', attributes: ['full_name', 'phone'] },
+                { model: Quiz, as: 'quiz', attributes: ['title'] }
+            ],
+            limit: l,
+            offset,
+            order: [['created_at', 'DESC']]
+        });
+        return ApiFeatures.formatResponse(data, page, l);
+    }
+
+    async getUserHistory(userId, page = 1, limit = 10) {
+        const { limit: l, offset } = ApiFeatures.getPagination(page, limit);
+        const data = await Result.findAndCountAll({
+            where: { user_id: userId },
+            include: [{ model: Quiz, as: 'quiz', attributes: ['title'] }],
+            limit: l,
+            offset,
+            order: [['created_at', 'DESC']]
+        });
+        return ApiFeatures.formatResponse(data, page, l);
     }
 }
 

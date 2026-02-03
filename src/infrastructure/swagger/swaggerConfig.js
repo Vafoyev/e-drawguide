@@ -1,16 +1,36 @@
 const swaggerJsdoc = require('swagger-jsdoc');
 const path = require('path');
-const basicInfo = require('../../docs/basicInfo');
 
 const options = {
     definition: {
-        ...basicInfo,
+        openapi: '3.0.0',
+        info: {
+            title: 'E-DrawGuide API',
+            version: '1.0.0',
+            description: 'LMS Backend API Documentation'
+        },
+        servers: [
+            {
+                url: '/api/v1',
+                description: 'V1 API'
+            }
+        ],
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT'
+                }
+            }
+        }
     },
-
     apis: [
-        path.join(__dirname, '../../docs/*.yaml')
-    ],
+        path.join(__dirname, '../../docs/*.yaml'),
+        path.join(__dirname, '../../docs/**/*.yaml')
+    ]
 };
 
-const specs = swaggerJsdoc(options);
-module.exports = specs;
+const swaggerSpecs = swaggerJsdoc(options);
+
+module.exports = swaggerSpecs;

@@ -23,8 +23,17 @@ const logger = winston.createLogger({
             datePattern: 'YYYY-MM-DD',
             maxFiles: '14d'
         }),
+        new winston.transports.DailyRotateFile({
+            filename: 'logs/access-%DATE%.log',
+            datePattern: 'YYYY-MM-DD',
+            maxFiles: '14d'
+        }),
     ],
 });
+
+logger.stream = {
+    write: (message) => logger.info(message.trim(), { type: 'access_log' })
+};
 
 if (process.env.NODE_ENV !== 'production') {
     logger.add(new winston.transports.Console({

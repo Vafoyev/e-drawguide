@@ -1,0 +1,25 @@
+{
+  "auth": {
+    "unauthorized": "Iltimos, tizimga kiring!",
+    "forbidden": "Sizda ushbu amalni bajarish uchun ruxsat yo'q!",
+    "invalid_token": "Token yaroqsiz!",
+    "expired_token": "Token muddati o'tgan!",
+    "login_failed": "Telefon yoki parol noto'g'ri",
+    "phone_exists": "Bu telefon raqami allaqachon mavjud"
+  },
+  "validation": {
+    "unique_constraint": "Ma'lumot allaqachon mavjud",
+    "file_required": "Fayl yuklanishi shart!",
+    "invalid_format": "Fayl mazmuni ruxsat berilmagan formatda!",
+    "empty_file": "Bo'sh fayl yuklash taqiqlanadi"
+  },
+  "common": {
+    "not_found": "Resurs topilmadi",
+    "server_error": "Ichki server xatoligi",
+    "success_deleted": "Muvaffaqiyatli o'chirildi"
+  },
+  "quiz": {
+    "no_questions": "Ushbu testda savollar mavjud emas",
+    "not_found": "Quiz topilmadi"
+  }
+}

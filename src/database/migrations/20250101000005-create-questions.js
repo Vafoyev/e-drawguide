@@ -1,5 +1,4 @@
 'use strict';
-
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('questions', {
@@ -12,10 +11,7 @@ module.exports = {
       quiz_id: {
         type: Sequelize.UUID,
         allowNull: false,
-        references: {
-          model: 'quizzes',
-          key: 'id'
-        },
+        references: { model: 'quizzes', key: 'id' },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
@@ -32,16 +28,20 @@ module.exports = {
         allowNull: false
       },
       created_at: {
-        allowNull: false,
-        type: Sequelize.DATE,
+        allowNull: false, type: Sequelize.DATE,
         defaultValue: Sequelize.fn('NOW')
       },
       updated_at: {
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: Sequelize.fn('NOW')
+      },
+      deleted_at: {
+        allowNull: true,
+        type: Sequelize.DATE
       }
     });
+    await queryInterface.addIndex('questions', ['quiz_id']);
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('questions');

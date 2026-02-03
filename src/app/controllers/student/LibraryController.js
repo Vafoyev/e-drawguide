@@ -1,24 +1,23 @@
 const LibraryService = require('../../../services/LibraryService');
 const LibraryResource = require('../../resources/LibraryResource');
+const catchAsync = require('../../../utils/catchAsync');
 
 class LibraryController {
-    async index(req, res, next) {
-        try {
-            const result = await LibraryService.getAll(req.query);
-
-            res.status(200).json({
-                success: true,
-                data: LibraryResource.collection(result.books),
-                meta: {
-                    total: result.total,
-                    pages: result.totalPages,
-                    current: result.currentPage
-                }
-            });
-        } catch (err) {
-            next(err);
-        }
+    constructor(libraryService) {
+        this.libraryService = libraryService;
     }
+
+    index = catchAsync(async (req, res) => {
+        const result = await this.libraryService.getAll(req.query);
+
+        const formattedData = LibraryResource.collection(result);
+
+        res.status(200).json({
+            success: true,
+            data: formattedData.items,
+            meta: result.meta
+        });
+    });
 }
 
-module.exports = new LibraryController();
+module.exports = new LibraryController(LibraryService);

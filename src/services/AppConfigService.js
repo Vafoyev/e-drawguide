@@ -11,8 +11,16 @@ class AppConfigService {
 
         if (!config) return { status: 'up_to_date' };
 
-        const hasNewUpdate = semver.gt(config.latest_version, currentVersion);
-        const isBelowMinimum = semver.lt(currentVersion, config.minimum_version);
+        const cleanCurrent = semver.clean(currentVersion) || semver.valid(semver.coerce(currentVersion));
+        const cleanLatest = semver.clean(config.latest_version) || semver.valid(semver.coerce(config.latest_version));
+        const cleanMin = semver.clean(config.minimum_version) || semver.valid(semver.coerce(config.minimum_version));
+
+        if (!cleanCurrent || !cleanLatest || !cleanMin) {
+            return { status: 'up_to_date' };
+        }
+
+        const hasNewUpdate = semver.gt(cleanLatest, cleanCurrent);
+        const isBelowMinimum = semver.lt(cleanCurrent, cleanMin);
 
         if (isBelowMinimum || (hasNewUpdate && config.is_force_update)) {
             return {

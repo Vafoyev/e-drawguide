@@ -1,29 +1,84 @@
-tags:
-  name: Student
-  description: Talabalar uchun kontentlar
-
 paths:
   /student/library:
     get:
-      summary: Kitoblar ro'yxati
       tags: [Student]
+      summary: Kutubxonani ko'rish
       security:
-        - BearerAuth: []
+        - bearerAuth: []
       parameters:
-        - in: query
-          name: search
-          schema:
-            type: string
-        - in: query
-          name: page
-          schema:
-            type: integer
+        - name: lang
+          in: query
+          schema: { type: string }
+        - name: search
+          in: query
+          schema: { type: string }
       responses:
         200:
           description: Kitoblar ro'yxati
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Book'
+
+  /student/videos:
+    get:
+      tags: [Student]
+      summary: Video darslarni olish
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: search
+          in: query
+          schema: { type: string }
+      responses:
+        200:
+          description: Videolar ro'yxati
+
+  /student/quizzes:
+    get:
+      tags: [Student]
+      summary: Faol testlar ro'yxati
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Quizlar ro'yxati
+
+  /student/quizzes/{id}:
+    get:
+      tags: [Student]
+      summary: Konkret test savollarini olish (Javoblarsiz)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        200:
+          description: Quiz va savollar
+
+  /student/quizzes/{id}/submit:
+    post:
+      tags: [Student]
+      summary: Test javoblarini topshirish va natijani hisoblash
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                answers:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      question_id: { type: string }
+                      selected_option: { type: string }
+      responses:
+        200:
+          description: Hisoblangan natija

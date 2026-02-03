@@ -2,20 +2,19 @@ const express = require('express');
 const router = express.Router();
 const authRoutes = require('./auth');
 const adminRoutes = require('./admin');
-const studentRoutes = require('./student'); // Yangi
+const studentRoutes = require('./student');
 const configRoutes = require('./config');
+const { checkSystemHealth } = require('../../../../utils/healthCheck');
 
 router.use('/auth', authRoutes);
 router.use('/admin', adminRoutes);
-router.use('/student', studentRoutes); // Ulandi
+router.use('/student', studentRoutes);
 router.use('/config', configRoutes);
 
-router.get('/', (req, res) => {
-    res.status(200).json({
-        success: true,
-        message: "E-DrawGuide API v1 muvaffaqiyatli ishlamoqda 🚀",
-        documentation: "/api-docs"
-    });
+router.get('/health', async (req, res) => {
+    const health = await checkSystemHealth();
+    const statusCode = health.status === 'healthy' ? 200 : 503;
+    res.status(statusCode).json(health);
 });
 
 module.exports = router;

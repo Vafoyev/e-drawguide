@@ -1,60 +1,73 @@
-tags:
-  name: Auth
-  description: Autentifikatsiya tizimi
-
 paths:
   /auth/register:
     post:
-      summary: Ro'yxatdan o'tish
       tags: [Auth]
+      summary: Ro'yxatdan o'tish
       requestBody:
-        required: true
         content:
           application/json:
             schema:
               type: object
-              required: [fullName, phone, password]
               properties:
-                fullName:
-                  type: string
-                phone:
-                  type: string
-                password:
-                  type: string
+                fullName: { type: string }
+                phone: { type: string }
+                password: { type: string }
       responses:
         201:
-          description: Muvaffaqiyatli yaratildi
-
+          description: OK
   /auth/login:
     post:
-      summary: Tizimga kirish
       tags: [Auth]
+      summary: Tizimga kirish
       requestBody:
-        required: true
         content:
           application/json:
             schema:
               type: object
-              required: [phone, password]
               properties:
-                phone:
-                  type: string
-                password:
-                  type: string
+                phone: { type: string }
+                password: { type: string }
       responses:
         200:
-          description: Token qaytariladi
-
+          description: OK
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Tizimdan chiqish
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: OK
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Tokenni yangilash
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh_token: { type: string }
+      responses:
+        200:
+          description: OK
   /auth/profile:
     get:
-      summary: Profil ma'lumotlari
       tags: [Auth]
+      summary: Profil ma'lumotlari
       security:
-        - BearerAuth: []
+        - bearerAuth: []
       responses:
         200:
-          description: User profili
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
+          description: OK
+  /auth/my-results:
+    get:
+      tags: [Auth]
+      summary: Mening test natijalarim
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: OK

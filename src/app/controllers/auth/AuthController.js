@@ -1,58 +1,65 @@
 const AuthService = require('../../../services/AuthService');
-const { registerSchema, loginSchema } = require('../../requests/auth/AuthRequest');
+const UserService = require('../../../services/UserService');
 const UserResource = require('../../resources/UserResource');
+const catchAsync = require('../../../utils/catchAsync');
 
 class AuthController {
-    async register(req, res, next) {
-        try {
-            const { error, value } = registerSchema.validate(req.body);
-            if (error) {
-                return res.status(400).json({ success: false, message: error.details[0].message });
-            }
-
-            const result = await AuthService.register(value);
-
-            res.status(201).json({
-                success: true,
-                message: "Ro'yxatdan muvaffaqiyatli o'tdingiz",
-                user: UserResource.format(result.user),
-                access_token: result.access_token
-            });
-        } catch (err) {
-            next(err);
-        }
+    constructor(authService, userService) {
+        this.authService = authService;
+        this.userService = userService;
     }
 
-    async login(req, res, next) {
-        try {
-            const { error, value } = loginSchema.validate(req.body);
-            if (error) {
-                return res.status(400).json({ success: false, message: error.details[0].message });
-            }
+    register = catchAsync(async (req, res) => {
+        const result = await this.authService.register(req.body);
+        res.status(201).json({
+            success: true,
+            user: UserResource.format(result.user),
+            ...result
+        });
+    });
 
-            const result = await AuthService.login(value.phone, value.password);
+    login = catchAsync(async (req, res) => {
+        const result = await this.authService.login(req.body.phone, req.body.password);
+        res.status(200).json({
+            success: true,
+            user: UserResource.format(result.user),
+            ...result
+        });
+    });
 
-            res.status(200).json({
-                success: true,
-                message: "Tizimga muvaffaqiyatli kirdingiz",
-                user: UserResource.format(result.user),
-                access_token: result.access_token
-            });
-        } catch (err) {
-            next(err);
-        }
-    }
+    logout = catchAsync(async (req, res) => {
+        const token = req.headers.authorization.split(' ')[1];
+        await this.authService.logout(token);
+        res.status(200).json({
+            success: true,
+            message: "Tizimdan muvaffaqiyatli chiqildi"
+        });
+    });
 
-    async getProfile(req, res, next) {
-        try {
-            res.status(200).json({
-                success: true,
-                user: UserResource.format(req.user)
-            });
-        } catch (err) {
-            next(err);
-        }
-    }
+    refresh = catchAsync(async (req, res) => {
+        const result = await this.authService.refreshToken(req.body.refresh_token);
+        res.status(200).json({
+            success: true,
+            ...result
+        });
+    });
+
+    getProfile = catchAsync(async (req, res) => {
+        res.status(200).json({
+            success: true,
+            user: UserResource.format(req.user)
+        });
+    });
+
+    getMyResults = catchAsync(async (req, res) => {
+        const { page, limit } = req.query;
+        const result = await this.userService.getUserHistory(req.user.id, page, limit);
+        res.status(200).json({
+            success: true,
+            data: result.items,
+            meta: result.meta
+        });
+    });
 }
 
-module.exports = new AuthController();
+module.exports = new AuthController(AuthService, UserService);
