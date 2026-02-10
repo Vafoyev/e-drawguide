@@ -2,7 +2,7 @@ paths:
   /config/check-version:
     get:
       tags: [Config]
-      summary: Ilova yangilanishini tekshirish
+      summary: Ilova versiyasini tekshirish
       parameters:
         - name: platform
           in: query
@@ -14,12 +14,11 @@ paths:
           schema: { type: string }
       responses:
         200:
-          description: Update status
-
+          description: OK
   /health:
     get:
-      tags: [ System ]
-      summary: Sistema holatini tekshirish (Health Check)
+      tags: [System]
+      summary: Sistema holatini tekshirish
       responses:
         200:
-          description: Tizim sog'lom
+          description: OK

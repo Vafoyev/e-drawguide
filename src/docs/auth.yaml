@@ -8,6 +8,7 @@ paths:
           application/json:
             schema:
               type: object
+              required: [fullName, phone, password]
               properties:
                 fullName: { type: string }
                 phone: { type: string }
@@ -24,6 +25,7 @@ paths:
           application/json:
             schema:
               type: object
+              required: [phone, password]
               properties:
                 phone: { type: string }
                 password: { type: string }
@@ -36,6 +38,13 @@ paths:
       summary: Tizimdan chiqish
       security:
         - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh_token: { type: string }
       responses:
         200:
           description: OK
@@ -48,6 +57,7 @@ paths:
           application/json:
             schema:
               type: object
+              required: [refresh_token]
               properties:
                 refresh_token: { type: string }
       responses:

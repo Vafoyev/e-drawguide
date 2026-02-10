@@ -22,6 +22,8 @@ describe('Auth Integration Tests', () => {
 
     afterAll(async () => {
         await sequelize.close();
-        await redis.quit();
+        if (redis.status !== 'end') {
+            await redis.quit();
+        }
     });
 });

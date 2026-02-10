@@ -47,6 +47,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Rebuild sharp for CI
+        run: npm rebuild sharp
+
       - name: Run Tests
         env:
           NODE_ENV: test

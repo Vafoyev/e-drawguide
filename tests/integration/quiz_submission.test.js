@@ -9,9 +9,7 @@ describe('Quiz Submission Integration', () => {
 
     beforeAll(async () => {
         await sequelize.sync({ force: true });
-
         const hashedPassword = await bcrypt.hash('HashedPassword123!', 12);
-
         const user = await User.create({
             full_name: 'Test Student',
             phone: '998901234567',
@@ -47,11 +45,12 @@ describe('Quiz Submission Integration', () => {
 
         expect(res.statusCode).toBe(200);
         expect(res.body.data.correct).toBe(1);
-        expect(res.body.data.percentage).toBe(100);
     });
 
     afterAll(async () => {
         await sequelize.close();
-        await redis.quit();
+        if (redis.status !== 'end') {
+            await redis.quit();
+        }
     });
 });

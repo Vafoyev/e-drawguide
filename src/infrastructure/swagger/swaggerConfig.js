@@ -26,8 +26,7 @@ const options = {
         }
     },
     apis: [
-        path.join(__dirname, '../../docs/*.yaml'),
-        path.join(__dirname, '../../docs/**/*.yaml')
+        path.join(__dirname, '../../docs/*.yaml')
     ]
 };
 

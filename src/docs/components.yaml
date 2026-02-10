@@ -4,7 +4,6 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-
   schemas:
     User:
       type: object
@@ -13,27 +12,33 @@ components:
         full_name: { type: string }
         phone: { type: string }
         role: { type: string, enum: [admin, student] }
-
     Video:
       type: object
       properties:
         id: { type: string, format: uuid }
         title: { type: string }
+        description: { type: string }
         video_url: { type: string }
         thumbnail_url: { type: string }
-
+        is_youtube: { type: boolean }
     Library:
       type: object
       properties:
         id: { type: string, format: uuid }
         title: { type: string }
         author: { type: string }
-        language: { type: string }
+        language: { type: string, enum: [uz, ru, en] }
         file_url: { type: string }
         cover_url: { type: string }
-
+    Quiz:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string }
+        is_active: { type: boolean }
     Error:
       type: object
       properties:
         success: { type: boolean, example: false }
         message: { type: string }
+        errorCode: { type: string }
