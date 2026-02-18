@@ -5,10 +5,17 @@ const ROLES = {
     STUDENT: 'student'
 };
 
-const LANGUAGES = ['uz', 'ru', 'en'];
+const LANGUAGES = {
+    UZ: 'uz',
+    RU: 'ru',
+    EN: 'en'
+};
+
+const DEFAULT_LANG = 'uz';
 
 module.exports = {
     PASSWORD_REGEX,
     ROLES,
-    LANGUAGES
+    LANGUAGES,
+    DEFAULT_LANG
 };

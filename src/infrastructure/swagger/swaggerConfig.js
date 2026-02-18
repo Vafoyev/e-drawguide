@@ -5,14 +5,18 @@ const options = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'E-DrawGuide API',
+            title: 'E-DrawGuide - LMS API Dokumentatsiyasi',
             version: '1.0.0',
-            description: 'LMS Backend API Documentation'
+            description: 'Talabalar platformasi uchun barcha REST APIlar.',
+            contact: {
+                name: 'Backend Support',
+                url: 'https://e-drawguide.uz'
+            }
         },
         servers: [
             {
                 url: '/api/v1',
-                description: 'V1 API'
+                description: 'Asosiy V1 API Server'
             }
         ],
         components: {
@@ -23,7 +27,10 @@ const options = {
                     bearerFormat: 'JWT'
                 }
             }
-        }
+        },
+        security: [{
+            bearerAuth: []
+        }]
     },
     apis: [
         path.join(__dirname, '../../docs/*.yaml')
@@ -31,5 +38,4 @@ const options = {
 };
 
 const swaggerSpecs = swaggerJsdoc(options);
-
 module.exports = swaggerSpecs;

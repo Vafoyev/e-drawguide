@@ -8,6 +8,7 @@ const { registerSchema, loginSchema, refreshSchema } = require('../../../request
 
 router.post('/register', validate(registerSchema), authController.register);
 router.post('/login', validate(loginSchema), authController.login);
+router.post('/admin/login', validate(loginSchema), authController.adminLogin);
 router.post('/refresh', validate(refreshSchema), authController.refresh);
 
 router.use(authenticate, checkBlacklist);

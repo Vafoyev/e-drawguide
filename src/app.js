@@ -33,7 +33,14 @@ app.use('/api/', apiLimiter);
 app.use('/api/v1/auth/login', authLimiter);
 app.use('/api/v1/auth/register', authLimiter);
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, {
+    swaggerOptions: {
+        persistAuthorization: true,
+        docExpansion: 'none',
+        filter: true
+    },
+    customSiteTitle: "E-DrawGuide API Documentation"
+}));
 app.use(cors({ origin: '*', credentials: true }));
 app.use(express.json({ limit: '1mb' }));
 app.use(setLang);

@@ -8,7 +8,7 @@ class AuthController {
     }
 
     register = catchAsync(async (req, res) => {
-        const result = await this.authService.register(req.body);
+        const result = await this.authService.register(req.body, req.lang);
         res.status(201).json({
             success: true,
             user: UserResource.format(result.user),
@@ -17,7 +17,16 @@ class AuthController {
     });
 
     login = catchAsync(async (req, res) => {
-        const result = await this.authService.login(req.body.phone, req.body.password);
+        const result = await this.authService.login(req.body.phone, req.body.password, req.lang);
+        res.status(200).json({
+            success: true,
+            user: UserResource.format(result.user),
+            ...result
+        });
+    });
+
+    adminLogin = catchAsync(async (req, res) => {
+        const result = await this.authService.adminLogin(req.body.phone, req.body.password, req.lang);
         res.status(200).json({
             success: true,
             user: UserResource.format(result.user),
@@ -36,7 +45,7 @@ class AuthController {
     });
 
     refresh = catchAsync(async (req, res) => {
-        const result = await this.authService.refreshToken(req.body.refresh_token);
+        const result = await this.authService.refreshToken(req.body.refresh_token, req.lang);
         res.status(200).json({
             success: true,
             ...result

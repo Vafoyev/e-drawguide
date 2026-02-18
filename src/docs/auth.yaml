@@ -2,7 +2,7 @@ paths:
   /auth/register:
     post:
       tags: [Auth]
-      summary: Ro'yxatdan o'tish
+      summary: Talaba sifatida ro'yxatdan o'tish
       requestBody:
         content:
           application/json:
@@ -10,16 +10,17 @@ paths:
               type: object
               required: [fullName, phone, password]
               properties:
-                fullName: { type: string }
-                phone: { type: string }
-                password: { type: string }
+                fullName: { type: string, example: "Ali Valiyev" }
+                phone: { type: string, example: "998901234567" }
+                password: { type: string, example: "Password123!" }
       responses:
         201:
           description: OK
+
   /auth/login:
     post:
       tags: [Auth]
-      summary: Tizimga kirish
+      summary: Talaba sifatida tizimga kirish
       requestBody:
         content:
           application/json:
@@ -27,31 +28,33 @@ paths:
               type: object
               required: [phone, password]
               properties:
-                phone: { type: string }
-                password: { type: string }
+                phone: { type: string, example: "998901234567" }
+                password: { type: string, example: "Password123!" }
       responses:
         200:
           description: OK
-  /auth/logout:
+
+  /auth/admin/login:
     post:
       tags: [Auth]
-      summary: Tizimdan chiqish
-      security:
-        - bearerAuth: []
+      summary: Admin panelga kirish (Faqat Adminlar uchun)
       requestBody:
         content:
           application/json:
             schema:
               type: object
+              required: [login, password]
               properties:
-                refresh_token: { type: string }
+                login: { type: string, example: "string" }
+                password: { type: string, example: "string" }
       responses:
         200:
           description: OK
+
   /auth/refresh:
     post:
       tags: [Auth]
-      summary: Tokenni yangilash
+      summary: Access Tokenni yangilash (Refresh Token orqali)
       requestBody:
         content:
           application/json:
@@ -63,21 +66,41 @@ paths:
       responses:
         200:
           description: OK
+
   /auth/profile:
     get:
       tags: [Auth]
-      summary: Profil ma'lumotlari
+      summary: Foydalanuvchi profil ma'lumotlari
       security:
         - bearerAuth: []
       responses:
         200:
           description: OK
+
   /auth/my-results:
     get:
       tags: [Auth]
-      summary: Mening test natijalarim
+      summary: Talabaning o'z test natijalari tarixi
       security:
         - bearerAuth: []
+      responses:
+        200:
+          description: OK
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Tizimdan chiqish
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refresh_token]
+              properties:
+                refresh_token: { type: string }
       responses:
         200:
           description: OK

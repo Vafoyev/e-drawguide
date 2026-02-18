@@ -8,12 +8,25 @@ module.exports = async (err, req, res, next) => {
     let message = err.message;
     let errorCode = err.errorCode || 'INTERNAL_ERROR';
 
-    if (req.file || req.files) {
-        const files = req.file ? [req.file] : Object.values(req.files).flat();
-        for (const file of files) {
-            if (file.path) await StorageManager.deleteFile(file.path).catch(() => {});
+    const cleanupFiles = async () => {
+        const filesTodelete = [];
+        if (req.file) filesTodelete.push(req.file.path);
+        if (req.files) {
+            Object.values(req.files).flat().forEach(f => {
+                if (f.path) filesTodelete.push(f.path);
+            });
         }
-    }
+
+        if (req.tempFiles && Array.isArray(req.tempFiles)) {
+            filesTodelete.push(...req.tempFiles);
+        }
+
+        for (const filePath of filesTodelete) {
+            await StorageManager.deleteFile(filePath).catch(() => {});
+        }
+    };
+
+    await cleanupFiles();
 
     if (err.name === 'SequelizeUniqueConstraintError') {
         statusCode = 409;
@@ -31,12 +44,6 @@ module.exports = async (err, req, res, next) => {
         statusCode = 401;
         errorCode = 'INVALID_TOKEN';
         message = t('auth.invalid_token', lang);
-    }
-
-    if (err.name === 'TokenExpiredError') {
-        statusCode = 401;
-        errorCode = 'TOKEN_EXPIRED';
-        message = t('auth.expired_token', lang);
     }
 
     if (process.env.NODE_ENV === 'development') {

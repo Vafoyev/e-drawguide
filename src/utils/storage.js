@@ -5,7 +5,7 @@ const crypto = require('crypto');
 const logger = require('./logger');
 
 class StorageManager {
-    static async saveImage(file, folder, width = 800) {
+    static async saveImage(file, folder, width = 800, req = null) {
         const fileName = `${crypto.randomUUID()}.webp`;
         const relativePath = `uploads/${folder}/${fileName}`;
         const fullPath = path.join(process.cwd(), relativePath);
@@ -17,6 +17,11 @@ class StorageManager {
             .resize(width)
             .webp({ quality: 80 })
             .toFile(fullPath);
+
+        if (req) {
+            if (!req.tempFiles) req.tempFiles = [];
+            req.tempFiles.push(fullPath);
+        }
 
         await fs.unlink(file.path).catch(() => {});
 
@@ -40,7 +45,7 @@ class StorageManager {
         if (!filePath) return;
         try {
             const cleanPath = filePath.startsWith('/') ? filePath.substring(1) : filePath;
-            const fullPath = path.resolve(process.cwd(), cleanPath);
+            const fullPath = path.isAbsolute(cleanPath) ? cleanPath : path.resolve(process.cwd(), cleanPath);
 
             const stats = await fs.stat(fullPath).catch(() => null);
             if (stats) {

@@ -42,9 +42,22 @@ class LibraryService {
         const library = await Library.findByPk(id, { paranoid: false, transaction });
         if (!library) throw new AppError('Kitob topilmadi', 404);
 
+        const extractLocalPath = (url) => {
+            if (!url) return null;
+            if (url.startsWith('http')) {
+                const parts = url.split('/uploads/');
+                return parts.length > 1 ? `uploads/${parts[1]}` : null;
+            }
+            return url.startsWith('/') ? url.substring(1) : url;
+        };
+
         if (library.deleted_at) {
-            await StorageManager.deleteFile(library.file_url);
-            await StorageManager.deleteFile(library.cover_url);
+            const bookPath = extractLocalPath(library.file_url);
+            const coverPath = extractLocalPath(library.cover_url);
+
+            if (bookPath) await StorageManager.deleteFile(bookPath);
+            if (coverPath) await StorageManager.deleteFile(coverPath);
+
             await library.destroy({ force: true, transaction });
         } else {
             await library.destroy({ transaction });
@@ -83,4 +96,4 @@ class LibraryService {
     }
 }
 
-module.exports = new LibraryService();
+module.exports = LibraryService;

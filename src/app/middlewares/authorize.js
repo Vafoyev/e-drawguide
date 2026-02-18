@@ -1,3 +1,6 @@
+const { ROLES } = require('../../utils/constants');
+const { t } = require('../../utils/i18n');
+
 module.exports = (roles = []) => {
     if (typeof roles === 'string') {
         roles = [roles];
@@ -7,7 +10,7 @@ module.exports = (roles = []) => {
         if (!roles.includes(req.user.role)) {
             return res.status(403).json({
                 success: false,
-                message: "Sizda ushbu amalni bajarish uchun ruxsat yo'q (Faqat Admin uchun)!"
+                message: t('auth.forbidden', req.lang)
             });
         }
         next();

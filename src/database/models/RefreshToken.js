@@ -4,7 +4,12 @@ module.exports = (sequelize, DataTypes) => {
         user_id: { type: DataTypes.UUID, allowNull: false },
         token: { type: DataTypes.TEXT, allowNull: false },
         expires_at: { type: DataTypes.DATE, allowNull: false }
-    }, { underscored: true, tableName: 'refresh_tokens', updatedAt: false });
+    }, {
+        underscored: true,
+        tableName: 'refresh_tokens',
+        updatedAt: false,
+        paranoid: false
+    });
 
     RefreshToken.associate = (models) => {
         RefreshToken.belongsTo(models.User, { foreignKey: 'user_id', as: 'user' });

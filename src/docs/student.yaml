@@ -2,7 +2,7 @@ paths:
   /student/library:
     get:
       tags: [Student]
-      summary: Kutubxona ro'yxati
+      summary: Kutubxonadagi kitoblar ro'yxati
       security:
         - bearerAuth: []
       parameters:
@@ -12,41 +12,34 @@ paths:
         - name: search
           in: query
           schema: { type: string }
-        - name: page
-          in: query
-          schema: { type: integer, default: 1 }
       responses:
         200:
           description: OK
+
   /student/videos:
     get:
       tags: [Student]
       summary: Video darslar ro'yxati
       security:
         - bearerAuth: []
-      parameters:
-        - name: search
-          in: query
-          schema: { type: string }
-        - name: page
-          in: query
-          schema: { type: integer, default: 1 }
       responses:
         200:
           description: OK
+
   /student/quizzes:
     get:
       tags: [Student]
-      summary: Faol testlar ro'yxati
+      summary: Mavjud faol testlar ro'yxati
       security:
         - bearerAuth: []
       responses:
         200:
           description: OK
+
   /student/quizzes/{id}:
     get:
       tags: [Student]
-      summary: Test savollarini olish
+      summary: Konkret test savollarini olish (To'g'ri javoblarsiz)
       security:
         - bearerAuth: []
       parameters:
@@ -57,10 +50,11 @@ paths:
       responses:
         200:
           description: OK
+
   /student/quizzes/{id}/submit:
     post:
       tags: [Student]
-      summary: Test natijasini topshirish
+      summary: Testni yakunlash va natijani topshirish
       security:
         - bearerAuth: []
       parameters:

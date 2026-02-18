@@ -4,11 +4,12 @@ const jwt = require('jsonwebtoken');
 const AppError = require('../utils/AppError');
 const { CacheManager } = require('../utils/cache');
 const transactional = require('../utils/transactional');
+const { t } = require('../utils/i18n');
 
 class AuthService {
-    register = transactional(async (data, transaction) => {
+    register = transactional(async (data, lang = 'uz', transaction) => {
         const candidate = await User.findOne({ where: { phone: data.phone }, transaction });
-        if (candidate) throw new AppError('Bu telefon raqami allaqachon mavjud', 409);
+        if (candidate) throw new AppError(t('auth.phone_exists', lang), 409);
 
         const hashedPassword = await bcrypt.hash(data.password, 12);
         const user = await User.create({
@@ -21,16 +22,30 @@ class AuthService {
         return await this.generateTokenPair(user, transaction);
     });
 
-    login = transactional(async (phone, password, transaction) => {
+    login = transactional(async (phone, password, lang = 'uz', transaction) => {
         const user = await User.findOne({ where: { phone }, transaction });
         if (!user || !(await bcrypt.compare(password, user.password))) {
-            throw new AppError('Telefon yoki parol noto\'g\'ri', 401);
+            throw new AppError(t('auth.login_failed', lang), 401);
         }
 
         return await this.generateTokenPair(user, transaction);
     });
 
-    refreshToken = transactional(async (oldRefreshToken, transaction) => {
+    adminLogin = transactional(async (login, password, lang = 'uz', transaction) => {
+        const user = await User.findOne({ where: { login }, transaction });
+
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            throw new AppError(t('auth.login_failed', lang), 401);
+        }
+
+        if (user.role !== 'admin') {
+            throw new AppError(t('auth.forbidden', lang), 403);
+        }
+
+        return await this.generateTokenPair(user, transaction);
+    });
+
+    refreshToken = transactional(async (oldRefreshToken, lang = 'uz', transaction) => {
         try {
             const decoded = jwt.verify(oldRefreshToken, process.env.JWT_REFRESH_SECRET);
             const savedToken = await RefreshToken.findOne({
@@ -40,17 +55,17 @@ class AuthService {
 
             if (!savedToken) {
                 await RefreshToken.destroy({ where: { user_id: decoded.id }, transaction });
-                throw new AppError('Xavfsizlik buzilishi aniqlandi! Barcha sessiyalar yopildi.', 401);
+                throw new AppError(t('auth.invalid_token', lang), 401);
             }
 
             const user = await User.findByPk(decoded.id, { transaction });
-            if (!user) throw new AppError('Foydalanuvchi topilmadi', 401);
+            if (!user) throw new AppError(t('common.not_found', lang), 401);
 
             await savedToken.destroy({ transaction });
             return await this.generateTokenPair(user, transaction);
         } catch (err) {
             if (err instanceof AppError) throw err;
-            throw new AppError('Refresh token yaroqsiz yoki muddati o\'tgan', 401);
+            throw new AppError(t('auth.expired_token', lang), 401);
         }
     });
 

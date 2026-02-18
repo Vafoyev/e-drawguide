@@ -5,13 +5,13 @@ RUN npm ci
 COPY . .
 
 FROM node:18-alpine
-WORKDIR /app
 RUN apk add --no-cache tzdata
 ENV TZ=Asia/Tashkent
-ENV NODE_ENV=production
+WORKDIR /app
 COPY --from=builder /app ./
 RUN mkdir -p logs uploads/books uploads/covers uploads/videos uploads/thumbnails && \
-    chown -R node:node logs uploads
+    chown -R node:node /app
 USER node
+VOLUME ["/app/uploads", "/app/logs"]
 EXPOSE 4001
 CMD ["npm", "start"]

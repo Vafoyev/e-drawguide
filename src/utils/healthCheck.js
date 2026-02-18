@@ -28,13 +28,13 @@ exports.checkSystemHealth = async () => {
     }
 
     try {
-        if (redis.status === 'ready') {
+        if (redis && redis.status === 'ready') {
             const start = Date.now();
             await redis.ping();
             health.services.redis = `connected (${Date.now() - start}ms)`;
         } else {
-            health.services.redis = 'disconnected';
-            health.status = 'unhealthy';
+            health.services.redis = 'disconnected/reconnecting';
+            if (process.env.NODE_ENV === 'production') health.status = 'degraded';
         }
     } catch (err) {
         health.services.redis = 'error';

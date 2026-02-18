@@ -2,6 +2,7 @@ const { Quiz, Question, Result } = require('../database');
 const AppError = require('../utils/AppError');
 const transactional = require('../utils/transactional');
 const { CacheManager } = require('../utils/cache');
+const { t } = require('../utils/i18n');
 
 class QuizService {
     async getAllQuizzes(userRole) {
@@ -60,7 +61,7 @@ class QuizService {
         return question;
     });
 
-    submitQuiz = transactional(async (userId, quizId, userAnswers, transaction) => {
+    submitQuiz = transactional(async (userId, quizId, userAnswers, lang = 'uz', transaction) => {
         const answersCacheKey = `quiz_answers:${quizId}`;
         let correctAnswersMap = await CacheManager.get(answersCacheKey);
 
@@ -71,7 +72,7 @@ class QuizService {
                 transaction
             });
 
-            if (questions.length === 0) throw new AppError('quiz.no_questions', 404);
+            if (questions.length === 0) throw new AppError(t('quiz.no_questions', lang), 404);
 
             correctAnswersMap = {};
             questions.forEach(q => {
@@ -97,20 +98,27 @@ class QuizService {
             }
         });
 
-        const result = await Result.create({
-            user_id: userId,
-            quiz_id: quizId,
-            score: score,
-            total_questions: totalQuestions
-        }, { transaction });
+        try {
+            const result = await Result.create({
+                user_id: userId,
+                quiz_id: quizId,
+                score: score,
+                total_questions: totalQuestions
+            }, { transaction });
 
-        return {
-            result_id: result.id,
-            correct: score,
-            total: totalQuestions,
-            percentage: totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0,
-            submitted_at: result.created_at
-        };
+            return {
+                result_id: result.id,
+                correct: score,
+                total: totalQuestions,
+                percentage: totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0,
+                submitted_at: result.created_at
+            };
+        } catch (error) {
+            if (error.name === 'SequelizeUniqueConstraintError') {
+                throw new AppError(t('validation.unique_constraint', lang), 409);
+            }
+            throw error;
+        }
     });
 }
 

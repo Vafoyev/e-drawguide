@@ -20,6 +20,7 @@ paths:
       responses:
         201:
           description: OK
+
   /admin/library/{id}:
     delete:
       tags: [Admin]
@@ -34,10 +35,11 @@ paths:
       responses:
         200:
           description: OK
+
   /admin/videos:
     post:
       tags: [Admin]
-      summary: Yangi video qo'shish
+      summary: Yangi video dars qo'shish
       security:
         - bearerAuth: []
       requestBody:
@@ -54,6 +56,7 @@ paths:
       responses:
         201:
           description: OK
+
   /admin/videos/{id}:
     delete:
       tags: [Admin]
@@ -68,50 +71,31 @@ paths:
       responses:
         200:
           description: OK
-  /admin/videos/{id}/restore:
-    patch:
-      tags: [Admin]
-      summary: O'chirilgan videoni tiklash
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema: { type: string, format: uuid }
-      responses:
-        200:
-          description: OK
+
   /admin/users:
     get:
       tags: [Admin]
-      summary: Foydalanuvchilar ro'yxati
+      summary: Barcha talabalar ro'yxati
       security:
         - bearerAuth: []
       responses:
         200:
           description: OK
+
   /admin/results:
     get:
       tags: [Admin]
-      summary: Barcha talabalar natijalari
+      summary: Barcha o'quvchilarning test natijalari (Umumiy)
       security:
         - bearerAuth: []
       responses:
         200:
           description: OK
+
   /admin/quizzes:
-    get:
-      tags: [Admin]
-      summary: Testlar ro'yxati (Admin uchun)
-      security:
-        - bearerAuth: []
-      responses:
-        200:
-          description: OK
     post:
       tags: [Admin]
-      summary: Yangi test yaratish
+      summary: Yangi test to'plami yaratish
       security:
         - bearerAuth: []
       requestBody:
@@ -122,10 +106,11 @@ paths:
               required: [title]
               properties:
                 title: { type: string }
-                is_active: { type: boolean }
+                is_active: { type: boolean, default: true }
       responses:
         201:
           description: OK
+
   /admin/quizzes/{id}/questions:
     post:
       tags: [Admin]
@@ -145,8 +130,11 @@ paths:
               required: [question_text, options, correct_answer]
               properties:
                 question_text: { type: string }
-                options: { type: array, items: { type: object } }
-                correct_answer: { type: string }
+                options:
+                  type: array
+                  items: { type: object }
+                  example: [{A: "Javob 1"}, {B: "Javob 2"}]
+                correct_answer: { type: string, example: "A" }
       responses:
         201:
           description: OK

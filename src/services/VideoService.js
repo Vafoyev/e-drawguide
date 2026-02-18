@@ -9,7 +9,7 @@ const StorageManager = require('../utils/storage');
 class VideoService {
     async getAll(query) {
         const { search, page = 1, limit = 10 } = query;
-        const cacheKey = `videos:${search || 'all'}:${page}:${limit}`;
+        const cacheKey = `videos:list:${search || 'all'}:${page}:${limit}`;
 
         const cachedData = await CacheManager.get(cacheKey);
         if (cachedData) return cachedData;
@@ -42,7 +42,7 @@ class VideoService {
             thumbnail_url
         }, { transaction });
 
-        await CacheManager.invalidate('videos:*');
+        await CacheManager.invalidate('videos:list:*');
         return video;
     });
 
@@ -51,11 +51,14 @@ class VideoService {
         if (!video) throw new AppError('Video topilmadi', 404);
 
         if (video.thumbnail_url) {
-            await StorageManager.deleteFile(video.thumbnail_url);
+            const cleanPath = video.thumbnail_url.startsWith('/')
+                ? video.thumbnail_url.substring(1)
+                : video.thumbnail_url;
+            await StorageManager.deleteFile(cleanPath);
         }
 
         await video.destroy({ force: true, transaction });
-        await CacheManager.invalidate('videos:*');
+        await CacheManager.invalidate('videos:list:*');
     });
 }
 

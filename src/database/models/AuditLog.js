@@ -8,5 +8,10 @@ module.exports = (sequelize, DataTypes) => {
         changes: { type: DataTypes.JSONB, allowNull: true },
         ip_address: { type: DataTypes.STRING, allowNull: true },
         user_agent: { type: DataTypes.STRING, allowNull: true }
-    }, { underscored: true, tableName: 'audit_logs', updatedAt: false });
+    }, {
+        underscored: true,
+        tableName: 'audit_logs',
+        updatedAt: false,
+        paranoid: false
+    });
 };
