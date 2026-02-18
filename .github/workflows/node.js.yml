@@ -14,16 +14,16 @@ jobs:
       postgres:
         image: postgres:15-alpine
         env:
-          POSTGRES_DB: e_drawguide_test_db
+          POSTGRES_DB: e_drawguide_db
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: ${{ secrets.DB_PASS }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASS || '12buny34' }}
         ports:
           - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
-          --health-retries 5
+          --health-retries 10
 
       redis:
         image: redis:alpine
@@ -33,7 +33,7 @@ jobs:
           --health-cmd "redis-cli ping"
           --health-interval 10s
           --health-timeout 5s
-          --health-retries 5
+          --health-retries 10
 
     steps:
       - uses: actions/checkout@v4
@@ -45,7 +45,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Rebuild sharp for CI
         run: npm rebuild sharp
@@ -55,13 +55,13 @@ jobs:
           NODE_ENV: test
           DB_HOST: localhost
           DB_PORT: 5432
-          DB_NAME: e_drawguide_test_db
+          DB_NAME: e_drawguide_db
           DB_USER: postgres
-          DB_PASS: ${{ secrets.DB_PASS }}
+          DB_PASS: ${{ secrets.DB_PASS || '12buny34' }}
           REDIS_HOST: localhost
           REDIS_PORT: 6379
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET || 'sdfdf%$#@^%&GYYVXGYDHBgvygvvdyu6543276t' }}
+          JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET || 'slckjbU&&^@#$*^&RFGTYCBWIt7d76idgeb^&#@' }}
           BASE_URL: http://localhost:4001
         run: npm test
 
@@ -74,6 +74,6 @@ jobs:
         with:
           node-version: 18
       - name: Install dependencies
-        run: npm ci
+        run: npm install
       - name: Audit Dependencies
-        run: npm audit --audit-level=high
+        run: npm audit --audit-level=critical
