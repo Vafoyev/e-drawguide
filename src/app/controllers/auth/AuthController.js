@@ -26,7 +26,7 @@ class AuthController {
     });
 
     adminLogin = catchAsync(async (req, res) => {
-        const result = await this.authService.adminLogin(req.body.phone, req.body.password, req.lang);
+        const result = await this.authService.adminLogin(req.body.login, req.body.password, req.lang);
         res.status(200).json({
             success: true,
             user: UserResource.format(result.user),

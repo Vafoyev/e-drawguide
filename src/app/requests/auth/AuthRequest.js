@@ -8,20 +8,20 @@ const registerSchema = Joi.object({
         'any.required': "Ism familiya yuborilishi shart"
     }),
     phone: Joi.string().pattern(/^\+?[0-9]{9,12}$/).required().messages({
-        'string.pattern.base': "Telefon raqami noto'g'ri formatda (masalan: 998901234567)",
+        'string.pattern.base': "Telefon raqami noto'g'ri formatda",
         'any.required': "Telefon raqami yuborilishi shart"
     }),
     password: Joi.string().pattern(PASSWORD_REGEX).required().messages({
-        'string.pattern.base': "Parol xavfsizlik talablariga javob bermaydi: Kamida 8 ta belgi, bitta katta harf, bitta raqam va bitta maxsus belgi bo'lishi shart",
-        'any.required': "Parol yuborilishi shart"
+        'string.pattern.base': "Parol kamida 8 ta belgi, bitta katta harf, raqam va maxsus belgi bo'lishi shart"
     }),
     role: Joi.string().valid('student', 'admin').default('student')
 });
 
 const loginSchema = Joi.object({
-    phone: Joi.string().required().messages({ 'string.empty': "Telefon raqamini kiriting" }),
+    phone: Joi.string().optional(),
+    login: Joi.string().optional(),
     password: Joi.string().required().messages({ 'string.empty': "Parolni kiriting" })
-});
+}).or('phone', 'login');
 
 const refreshSchema = Joi.object({
     refresh_token: Joi.string().required().messages({ 'string.empty': "Refresh token yuborilishi shart" })
