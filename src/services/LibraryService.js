@@ -96,4 +96,4 @@ class LibraryService {
     }
 }
 
-module.exports = LibraryService;
+module.exports = new LibraryService();
