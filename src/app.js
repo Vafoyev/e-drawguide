@@ -23,11 +23,21 @@ if (process.env.SENTRY_DSN) {
     app.use(Sentry.Handlers.requestHandler());
 }
 
-app.use(helmet());
+app.use('/api-docs', (req, res, next) => {
+    res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com; style-src 'self' 'https:' 'unsafe-inline'; img-src 'self' data: https:;");
+    next();
+});
+
+app.use(helmet({
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: false
+}));
+
 app.use(xss());
 app.use(hpp());
 app.use(compression());
 app.use(morgan('combined', { stream: logger.stream }));
+app.use(cors({ origin: '*', credentials: true }));
 
 app.use('/api/', apiLimiter);
 app.use('/api/v1/auth/login', authLimiter);
@@ -41,7 +51,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, {
     },
     customSiteTitle: "E-DrawGuide API Documentation"
 }));
-app.use(cors({ origin: '*', credentials: true }));
+
 app.use(express.json({ limit: '1mb' }));
 app.use(setLang);
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
